@@ -64,6 +64,7 @@ def show_note():
 notes_list.itemClicked.connect(show_note)
 notes_list.addItems(notes)
 
+
 def add_note():
     note_name, ok = QInputDialog.getText(window, "Нова замітка", "Введіть назву замітки")
     if ok and note_name != "":
@@ -78,6 +79,13 @@ with open("notes.json", "r", encoding="utf-8") as file:
     notes = json.load(file)
 
 notes_list.addItems(notes)
+def dell_note():
+    selected_note = notes_list.currentItem().text()
+    del notes[selected_note]
+    notes_list.takeItem(notes_list.currentRow())
+    text.clear()
+    writeFile()
+remove_note_btn.clicked.connect(dell_note)
 def save_note():
     note_text = text.toPlainText()
     note_name = notes_list.currentItem().text()
