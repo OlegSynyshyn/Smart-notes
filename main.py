@@ -55,14 +55,27 @@ def writeFile():
 main_line.addLayout(line1, stretch=2)
 main_line.addLayout(line2, stretch=1)
 window.setLayout(main_line)
+
+
 def show_note():
     note_name = notes_list.currentItem().text()
     print(notes)
     text.setText(notes[note_name]['text'])
-
-
+    tags_list.clear()
+    tags_list.addItems(notes[note_name]['tags'])
 notes_list.itemClicked.connect(show_note)
 notes_list.addItems(notes)
+
+
+def add_tag():
+    note_name = notes_list.currentItem().text()
+    tag = add_teg.text()
+    
+    notes[note_name]["tags"].append(tag)
+    tags_list.addItem(tag)
+    writeFile()
+    
+add_teg_btn.clicked.connect(add_tag)
 
 
 def add_note():
@@ -75,17 +88,34 @@ def add_note():
         notes_list.addItem(note_name)
 create_note_btn.clicked.connect(add_note)
 
+
 with open("notes.json", "r", encoding="utf-8") as file:
     notes = json.load(file)
 
 notes_list.addItems(notes)
+def search_by_tag():
+    note_name = notes_list.currentItem().text()
+    tag = add_teg.text()
+    text.setText(notes[note_name]['text'])
+def dell_tag():
+    note_name = notes_list.currentItem().text()
+    tag_name = tags_list.currentItem().text()
+    notes[note_name]['tags'].remove(tag_name)
+    tags_list.clear()
+    tags_list.addItems(notes[note_name]["tags"])
+    writeFile()
+unpin_teg_btn.clicked.connect(dell_tag)
+
+
 def dell_note():
-    selected_note = notes_list.currentItem().text()
-    del notes[selected_note]
+    note_name = notes_list.currentItem().text()
+    del notes[note_name]
     notes_list.takeItem(notes_list.currentRow())
     text.clear()
     writeFile()
 remove_note_btn.clicked.connect(dell_note)
+
+
 def save_note():
     note_text = text.toPlainText()
     note_name = notes_list.currentItem().text()
