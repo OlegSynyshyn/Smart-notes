@@ -11,8 +11,6 @@ add_teg = QLineEdit()
 notes_list = QListWidget()
 line_list = QLineEdit()
 tags_list = QListWidget()
-
-
 main_line = QHBoxLayout()
 line1 = QVBoxLayout()
 line2 = QVBoxLayout()
@@ -24,6 +22,57 @@ add_teg_btn = QPushButton("Додати до замітки")
 unpin_teg_btn = QPushButton("Відкріпити від замітки")
 search_teg_btn = QPushButton("Шукати замітки по тегу")
 
+text.setStyleSheet('''
+background-color: #9bf542;
+color: #8f0000                 
+''')
+notes_list.setStyleSheet('''
+background-color: #8f0000;
+color: #9bf542                 
+''')
+line_list.setStyleSheet('''
+background-color: #9bf542;
+color: #8f0000                 
+''')
+tags_list.setStyleSheet('''
+background-color: #8f0000;
+color: #9bf542                 
+''')
+
+add_teg.setStyleSheet('''
+background-color: #9bf542;
+color: #8f0000                 
+''')
+
+create_note_btn.setStyleSheet('''
+background-color: #d9c82e;
+color: #8f0000                 
+''')
+
+remove_note_btn.setStyleSheet('''
+background-color: #d9c82e;
+color: #8f0000                 
+''')
+
+save_note_btn.setStyleSheet('''
+background-color: #d9c82e;
+color: #8f0000                 
+''')
+
+add_teg_btn.setStyleSheet('''
+background-color: #d9c82e;
+color: #8f0000                 
+''')
+
+unpin_teg_btn.setStyleSheet('''
+background-color: #d9c82e;
+color: #8f0000                 
+''')
+
+search_teg_btn.setStyleSheet('''
+background-color: #d9c82e;
+color: #8f0000                 
+''')
 
 
 main_line.addLayout(line1)
@@ -94,9 +143,36 @@ with open("notes.json", "r", encoding="utf-8") as file:
 
 notes_list.addItems(notes)
 def search_by_tag():
-    note_name = notes_list.currentItem().text()
     tag = add_teg.text()
-    text.setText(notes[note_name]['text'])
+    if(search_teg_btn.text()=="Шукати замітки по тегу"):
+        filtered = {}
+        
+        for key in notes: 
+            
+            
+            if tag in notes[key]['tags']:
+            
+                filtered[key] = notes[key]
+                
+        
+        notes_list.clear()
+        notes_list.addItems(filtered)
+        tags_list.clear()
+        line_list.clear()
+        
+        search_teg_btn.setText("Відмінити пошук")
+    else:
+        add_teg.clear()
+        search_teg_btn.setText("Шукати замітки по тегу")
+        notes_list.clear()
+        notes_list.addItems(notes)
+        tags_list.clear()
+search_teg_btn.clicked.connect(search_by_tag)
+
+
+
+
+
 def dell_tag():
     note_name = notes_list.currentItem().text()
     tag_name = tags_list.currentItem().text()
