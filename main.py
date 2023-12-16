@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import (QApplication, 
 QTextEdit, QListWidget, QTextEdit, QWidget, 
 QPushButton, QLineEdit, QListWidget, QHBoxLayout, 
-QVBoxLayout, QInputDialog)
+QVBoxLayout, QInputDialog, QMessageBox)
 import json
 app = QApplication([])
 window = QWidget()
-
+error_save = QMessageBox()
 text = QTextEdit()
 add_teg = QLineEdit()
 notes_list = QListWidget()
@@ -14,7 +14,7 @@ tags_list = QListWidget()
 main_line = QHBoxLayout()
 line1 = QVBoxLayout()
 line2 = QVBoxLayout()
-
+window.setWindowTitle("Notes V1.2")
 create_note_btn = QPushButton("Створити замітку")
 remove_note_btn = QPushButton("Видалити замітку")
 save_note_btn = QPushButton("Зберегти замітку")
@@ -75,25 +75,41 @@ color: #8f0000
 ''')
 
 
+
+
+line1.addWidget(text)
+line2.addWidget(notes_list)
+
+h_line = QHBoxLayout()
+
+h_line.addWidget(create_note_btn)
+h_line.addWidget(remove_note_btn)
+
+line2.addLayout(h_line)
+line2.addWidget(save_note_btn)
+line2.addWidget(tags_list)
+
+
+line2.addWidget(add_teg)
+
+h2_line = QHBoxLayout()
+h2_line.addWidget(add_teg_btn)
+h2_line.addWidget(unpin_teg_btn)
+line2.addLayout(h2_line)
+line2.addWidget(search_teg_btn)
+
 main_line.addLayout(line1)
 main_line.addLayout(line2)
 
 window.setLayout(main_line)
 
-
-line1.addWidget(text)
-line2.addWidget(notes_list)
-line2.addWidget(create_note_btn)
-line2.addWidget(remove_note_btn)
-line2.addWidget(save_note_btn)
-line2.addWidget(tags_list)
-line2.addWidget(add_teg)
-line2.addWidget(add_teg_btn)
-line2.addWidget(unpin_teg_btn)
-line2.addWidget(search_teg_btn)
-
 notes = {}
 
+try:
+    with open("notes.json", "r", encoding="utf-8") as file:
+        notes = json.load(file)
+except:
+    print("File not found")
 
 def writeFile():
     with open("notes.json", "w", encoding="utf-8") as file:
@@ -117,13 +133,18 @@ notes_list.addItems(notes)
 
 
 def add_tag():
-    note_name = notes_list.currentItem().text()
-    tag = add_teg.text()
-    
-    notes[note_name]["tags"].append(tag)
-    tags_list.addItem(tag)
-    writeFile()
-    
+    try:
+        note_name = notes_list.currentItem().text()
+        tag = add_teg.text()
+        
+        notes[note_name]["tags"].append(tag)
+        tags_list.addItem(tag)
+        writeFile()
+    except:
+        error_save.setWindowTitle("ERROR")
+        error_save.setText("Виберіть нотатку для додавання тегу")
+        
+        error_save.exec_()
 add_teg_btn.clicked.connect(add_tag)
 
 
@@ -138,10 +159,6 @@ def add_note():
 create_note_btn.clicked.connect(add_note)
 
 
-with open("notes.json", "r", encoding="utf-8") as file:
-    notes = json.load(file)
-
-notes_list.addItems(notes)
 def search_by_tag():
     tag = add_teg.text()
     if(search_teg_btn.text()=="Шукати замітки по тегу"):
@@ -174,29 +191,51 @@ search_teg_btn.clicked.connect(search_by_tag)
 
 
 def dell_tag():
-    note_name = notes_list.currentItem().text()
-    tag_name = tags_list.currentItem().text()
-    notes[note_name]['tags'].remove(tag_name)
-    tags_list.clear()
-    tags_list.addItems(notes[note_name]["tags"])
-    writeFile()
+    try: 
+        note_name = notes_list.currentItem().text()
+        tag_name = tags_list.currentItem().text()
+        notes[note_name]['tags'].remove(tag_name)
+        tags_list.clear()
+        tags_list.addItems(notes[note_name]["tags"])
+        writeFile()
+    except:
+        error_save.setWindowTitle("ERROR")
+        error_save.setText("Виберіть нотатку для відкріплення тегу")
+        
+        error_save.exec_()
 unpin_teg_btn.clicked.connect(dell_tag)
 
 
 def dell_note():
-    note_name = notes_list.currentItem().text()
-    del notes[note_name]
-    notes_list.takeItem(notes_list.currentRow())
-    text.clear()
-    writeFile()
+    try:
+        note_name = notes_list.currentItem().text()
+        del notes[note_name]
+        notes_list.takeItem(notes_list.currentRow())
+        text.clear()
+        writeFile()
+    except:
+        error_save.setWindowTitle("ERROR")
+        error_save.setText("Виберіть нотатку для видалення")
+        
+        error_save.exec_()
 remove_note_btn.clicked.connect(dell_note)
 
 
 def save_note():
-    note_text = text.toPlainText()
-    note_name = notes_list.currentItem().text()
-    notes[note_name]['text'] = note_text
-    writeFile()
+    try:
+        note_text = text.toPlainText()
+        
+        note_name = notes_list.currentItem().text()
+
+        notes[note_name]['text'] = note_text
+        writeFile()
+    except:
+      
+
+        error_save.setWindowTitle("ERROR")
+        error_save.setText("Виберіть нотатку для збереження")
+        
+        error_save.exec_()
 save_note_btn.clicked.connect(save_note)
 
 
